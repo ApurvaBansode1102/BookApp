@@ -117,7 +117,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   ),
                 ],
                 const SizedBox(height: 28),
-
               ],
             ),
           ),
@@ -128,6 +127,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -152,28 +154,81 @@ class _ContactsScreenState extends State<ContactsScreen> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: _contacts.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) {
-        final contact = _contacts[index];
-        return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: ListTile(
-            leading: const CircleAvatar(child: Icon(Icons.person)),
-            title: Text(contact.displayName ?? 'No Name'),
-            subtitle: Text(
-              contact.phones?.isNotEmpty == true
-                  ? contact.phones!.first.value ?? ''
-                  : '',
+    final itemPadding = isTablet ? 24.0 : 12.0;
+    final cardElevation = isTablet ? 4.0 : 2.0;
+    final avatarRadius = isTablet ? 32.0 : 24.0;
+    final fontSizeTitle = isTablet ? 22.0 : 18.0;
+    final fontSizeSubtitle = isTablet ? 18.0 : 14.0;
+
+    if (isTablet) {
+      // Grid for tablets
+      return GridView.builder(
+        padding: EdgeInsets.all(itemPadding),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 3.5,
+          crossAxisSpacing: itemPadding,
+          mainAxisSpacing: itemPadding,
+        ),
+        itemCount: _contacts.length,
+        itemBuilder: (context, index) {
+          final contact = _contacts[index];
+          return Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: cardElevation,
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: avatarRadius,
+                child: const Icon(Icons.person, size: 32),
+              ),
+              title: Text(
+                contact.displayName ?? 'No Name',
+                style: TextStyle(fontSize: fontSizeTitle),
+              ),
+              subtitle: Text(
+                contact.phones?.isNotEmpty == true
+                    ? contact.phones!.first.value ?? ''
+                    : '',
+                style: TextStyle(fontSize: fontSizeSubtitle),
+              ),
+              onTap: () => _showContactSheet(contact),
             ),
-            onTap: () => _showContactSheet(contact),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    } else {
+      // List for mobile
+      return ListView.separated(
+        padding: EdgeInsets.all(itemPadding),
+        itemCount: _contacts.length,
+        separatorBuilder: (_, __) => SizedBox(height: itemPadding / 2),
+        itemBuilder: (context, index) {
+          final contact = _contacts[index];
+          return Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: cardElevation,
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: avatarRadius,
+                child: const Icon(Icons.person),
+              ),
+              title: Text(
+                contact.displayName ?? 'No Name',
+                style: TextStyle(fontSize: fontSizeTitle),
+              ),
+              subtitle: Text(
+                contact.phones?.isNotEmpty == true
+                    ? contact.phones!.first.value ?? ''
+                    : '',
+                style: TextStyle(fontSize: fontSizeSubtitle),
+              ),
+              onTap: () => _showContactSheet(contact),
+            ),
+          );
+        },
+      );
+    }
   }
 }
