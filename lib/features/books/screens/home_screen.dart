@@ -83,8 +83,22 @@ class HomeScreen extends StatelessWidget {
                         Row(
 
                           children:  [
-                            Icon(Icons.grid_view),
-                            Icon(Icons.menu_outlined),
+                            IconButton(
+                              onPressed: () {
+                                controller.isGridView.value = true;
+                              },
+                              icon: Obx(() => Icon(Icons.grid_view_outlined,
+                                color: controller.isGridView.value ? Colors.blue : Colors.black,
+                              ),),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                controller.isGridView.value = false;
+                              },
+                              icon: Obx(() => Icon(Icons.list_outlined,
+                                color: !controller.isGridView.value ? Colors.blue : Colors.black,
+                              ),),
+                            ),
                           ],
                         ),
                       ],
@@ -102,7 +116,8 @@ class HomeScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return Padding(
                               padding: EdgeInsets.only(
-                                bottom: Responsive.padding(context, mobile: 12, tablet: 24),
+                                bottom: Responsive.padding(
+                                    context, mobile: 12, tablet: 24),
                               ),
                               child: Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
@@ -124,43 +139,84 @@ class HomeScreen extends StatelessWidget {
                           child: Text(
                             'No books found.',
                             style: GoogleFonts.poppins(
-                              fontSize: Responsive.fontSize(context, mobile: 14, tablet: 18),
+                              fontSize: Responsive.fontSize(
+                                  context, mobile: 14, tablet: 18),
                             ),
                           ),
                         );
                       }
-                      return ListView.builder(
+                      // Grid View
+
+                      return controller.isGridView.value
+                          ? GridView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isTablet ? 3 : 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: isTablet ? 1.2 : 0.7,
+                        ),
                         itemCount: controller.filteredBooks.length,
                         itemBuilder: (context, index) {
                           final book = controller.filteredBooks[index];
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: Responsive.padding(context, mobile: 12, tablet: 24),
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                controller.lastTappedBook = book;
-                                controller.lastTappedBookApiResponse = book is Map<String, dynamic> ? book as Map<String, dynamic>? : null;
-                                Get.to(
-                                  () => BookDetailScreen(book: book),
-                                  transition: Transition.cupertino,
-                                );
-                              },
-                              child: CourseItem(
-                                title: book.title,
-                                author: book.authors.isNotEmpty
-                                    ? book.authors.first
-                                    : 'Unknown Author',
-                                imageUrl: book.thumbnail,
-                              ),
+                          return GestureDetector(
+                            onTap: () {
+                              controller.lastTappedBook = book;
+                              controller.lastTappedBookApiResponse =
+                              book is Map<String, dynamic> ? book as Map<
+                                  String,
+                                  dynamic>? : null;
+                              Get.to(
+                                    () => BookDetailScreen(book: book),
+                                transition: Transition.cupertino,
+                              );
+                            },
+                            child: CourseItem(
+                              title: book.title,
+                              author: book.authors.isNotEmpty ? book.authors
+                                  .first : 'Unknown Author',
+                              imageUrl: book.thumbnail,
+                              isGrid: true
                             ),
                           );
                         },
+                      )
+                          : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: controller.filteredBooks.length,
+                          itemBuilder: (context, index) {
+                            final book = controller.filteredBooks[index];
+                            return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: Responsive.padding(
+                                      context, mobile: 12, tablet: 24),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    controller.lastTappedBook = book;
+                                    controller.lastTappedBookApiResponse =
+                                    book is Map<String, dynamic> ? book as Map<
+                                        String,
+                                        dynamic>? : null;
+                                    Get.to(
+                                          () => BookDetailScreen(book: book),
+                                      transition: Transition.cupertino,
+                                    );
+                                  },
+                                  child: CourseItem(
+                                    title: book.title,
+                                    author: book.authors.isNotEmpty ? book
+                                        .authors.first : 'Unknown Author',
+                                    imageUrl: book.thumbnail,
+                                    isGrid: false
+                                  ),
+                                ));
+                          }
                       );
-                    }),
-                  ],
+
+                    })],
                 ),
               ),
             ),

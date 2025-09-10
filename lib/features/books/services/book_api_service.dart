@@ -6,7 +6,6 @@ import '../../core/constants.dart'; // Import the constants file
 /// Service for fetching book data from Google Books API
 class BookApiService {
   /// Search books by title
-  /// Returns a list of Book objects matching the query
   static Future<List<Book>> searchBooks(String query) async {
     final url = Uri.parse(
       '${AppConstants.googleBooksBaseUrl}?q=intitle:${Uri.encodeComponent(query)}',
@@ -18,13 +17,12 @@ class BookApiService {
       final items = data['items'] as List<dynamic>? ?? [];
       // Parse each item into a Book model
       return items.map((item) => Book.fromJson(item)).toList();
+
     }
-    // Return empty list if request fails
     return [];
   }
 
   /// Fetch books by author
-  /// Optionally exclude a book by its ID
   static Future<List<Book>> booksByAuthor(String author, {String? excludeId}) async {
     final url = Uri.parse(
       '${AppConstants.googleBooksBaseUrl}?q=inauthor:${Uri.encodeComponent(author)}',

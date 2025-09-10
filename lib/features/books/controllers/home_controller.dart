@@ -7,10 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/book_api_service.dart';
 
 class HomeController extends GetxController {
+
   var isLoading = false.obs;
   var selectedTab = 0.obs;
-  // Add a filteredBooks observable
+  var isGridView = false.obs;
   var filteredBooks = <Book>[].obs;
+
   // Call this after fetching books or when tab changes
   void filterBooks() {
     if (selectedTab.value == 0) {
@@ -32,16 +34,15 @@ class HomeController extends GetxController {
   // For analytics: store last tapped book and its API response
   Book? lastTappedBook;
   Map<String, dynamic>? lastTappedBookApiResponse;
-  var allBooks = <Items>[].obs;
-  var categories = [
-    'Fiction',
-    'Non-fiction',
-    'Romance',
-    'Sci-fi',
-    'Thriller',
-    'History',
-    'Biography',
-  ];
+  // var categories = [
+  //   'Fiction',
+  //   'Non-fiction',
+  //   'Romance',
+  //   'Sci-fi',
+  //   'Thriller',
+  //   'History',
+  //   'Biography',
+  // ];
   //var selectedTab = 0.obs;
   var searchHistory = <String>[].obs;
   var books = <Book>[].obs;
@@ -51,11 +52,11 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadHistory();
-    fetchBooksByCategory(categories.first); // Default: Fiction
+    fetchBooksByCategory(); 
   }
 
-  Future<void> fetchBooksByCategory(String category) async {
-    final books = await BookApiService.searchBooks(category);
+  Future<void> fetchBooksByCategory() async {
+    final books = await BookApiService.searchBooks(String.fromCharCode(65 + selectedTab.value));
   }
 
   Future<void> loadHistory() async {
@@ -76,7 +77,7 @@ class HomeController extends GetxController {
   // Keep only unique queries in history, most recent first
   searchHistory.remove(query);
   searchHistory.insert(0, query);
-  await saveHistory(); // Save after update
+  await saveHistory();
   final results = await BookApiService.searchBooks(query);
   books.value = results;
   filterBooks();

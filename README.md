@@ -6,8 +6,6 @@ A Flutter app to browse, search, and view books using the Google Books API. Incl
 
 ## Screenshots
 
-> Replace these with your own screenshots from the app
-
 ![Splash 1](assets/screenshot/onboarding1.jpeg)  
 ![Splash 2](assets/screenshot/onboarding2.jpeg)  
 ![Intro](assets/screenshot/img3.jpeg)  
